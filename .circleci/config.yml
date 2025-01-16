@@ -11,12 +11,13 @@ jobs:
       image_tag:
         type: string
         default: "latest" # Tag de la imagen por defecto
+      region:
+        type: string
+        default: "us-east-1" # Región de AWS por defecto
 
     docker:
       - image: circleci/python:3.9 
-    environment:
-      AWS_DEFAULT_REGION: "us-east-1" # Región de AWS (puedes cambiarla)
-    
+  
     steps:
       - setup_remote_docker:
             docker_layer_caching: true
@@ -43,7 +44,7 @@ jobs:
           command: |
             aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
             aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-            aws configure set default.region us-east-1
+            aws configure set default.region << parameters.region >>
       
       # Verificar la identidad del usuario
       - run:
@@ -61,21 +62,21 @@ jobs:
       - run:
           name: Autenticarse en Amazon ECR
           command: |
-            aws ecr get-login-password --region $AWS_DEFAULT_REGION | \
-            docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+            aws ecr get-login-password --region << parameters.region >> | \
+            docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.<< parameters.region >>.amazonaws.com
 
       # Etiquetar la imagen Docker
       - run:
           name: Etiquetar la imagen Docker
           command: |
             docker tag << parameters.repository >>:<< parameters.image_tag >> \
-            $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/<< parameters.repository >>:<< parameters.image_tag >>
+            $AWS_ACCOUNT_ID.dkr.ecr.<< parameters.region >>.amazonaws.com/<< parameters.repository >>:<< parameters.image_tag >>
 
       # Subir la imagen a Amazon ECR
       - run:
           name: Subir la imagen Docker a ECR
           command: |
-            docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/<< parameters.repository >>:<< parameters.image_tag >>
+            docker push $AWS_ACCOUNT_ID.dkr.ecr.<< parameters.region >>.amazonaws.com/<< parameters.repository >>:<< parameters.image_tag >>
 
 workflows:
   version: 2
