@@ -48,7 +48,9 @@ jobs:
       # Verificar la identidad del usuario
       - run:
           name: Verificar la identidad del usuario
-          command: aws sts get-caller-identity
+          command: |
+            export AWS_PAGER=""
+            aws sts get-caller-identity
       # Construcción de la imagen Docker
       - run:
           name: Construir la imagen Docker
