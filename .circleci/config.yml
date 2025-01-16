@@ -1,0 +1,66 @@
+version: 2.1
+
+parameters:
+  repository:
+    type: string
+    default: "glbm-container" # Nombre del repositorio ECR por defecto
+  image_tag:
+    type: string
+    default: "latest" # Tag de la imagen por defecto
+
+jobs:
+  build-and-deploy:
+    docker:
+      - image: amazon/aws-cli:2.23.0 # Imagen oficial con AWS CLI y Docker
+    environment:
+      AWS_DEFAULT_REGION: "us-east-1" # Región de AWS (puedes cambiarla)
+    steps:
+      - checkout
+
+      # Configuración del AWS CLI con claves de entorno ya definidas en CircleCI
+      - run:
+          name: Configurar AWS CLI
+          command: |
+            aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+            aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+            aws configure set default.region $AWS_DEFAULT_REGION
+
+      # Construcción de la imagen Docker
+      - run:
+          name: Construir la imagen Docker
+          command: |
+            docker build -t << parameters.repository >>:<< parameters.image_tag >> .
+
+      # Autenticación con Amazon ECR
+      - run:
+          name: Autenticarse en Amazon ECR
+          command: |
+            aws ecr get-login-password --region $AWS_DEFAULT_REGION | \
+            docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+
+      # Etiquetar la imagen Docker
+      - run:
+          name: Etiquetar la imagen Docker
+          command: |
+            docker tag << parameters.repository >>:<< parameters.image_tag >> \
+            $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/<< parameters.repository >>:<< parameters.image_tag >>
+
+      # Subir la imagen a Amazon ECR
+      - run:
+          name: Subir la imagen Docker a ECR
+          command: |
+            docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/<< parameters.repository >>:<< parameters.image_tag >>
+
+workflows:
+  version: 2
+  deploy:
+    jobs:
+      - build-and-deploy:
+          parameters:
+            # repository: "glbm-container"
+            image_tag: "1.0.0"
+          filters:
+            branches:
+              only:
+                - main
+        
