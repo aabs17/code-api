@@ -42,7 +42,7 @@ jobs:
 
       # Configuración del AWS CLI con claves de entorno ya definidas en CircleCI
 
-      - setup:
+      - aws-cli/setup:
           region: << parameters.region >>
       # - run:
       #     name: Configurar AWS CLI
