@@ -70,13 +70,13 @@ jobs:
           name: Etiquetar la imagen Docker
           command: |
             docker tag << parameters.repository >>:<< parameters.image_tag >> \
-            $AWS_ACCOUNT_ID.dkr.ecr.<< parameters.region >>.amazonaws.com/<< parameters.repository >>:<< parameters.image_tag >>
+            abts17/simplenode:1.0.0
 
       # Subir la imagen a Amazon ECR
       - run:
           name: Subir la imagen Docker a ECR
           command: |
-            docker push $AWS_ACCOUNT_ID.dkr.ecr.<< parameters.region >>.amazonaws.com/<< parameters.repository >>:<< parameters.image_tag >>
+            docker push abts17/simplenode:1.0.0
 
 workflows:
   version: 2
