@@ -72,6 +72,10 @@ jobs:
             docker tag << parameters.repository >>:<< parameters.image_tag >> \
             abts17/simplenode:1.0.0
       - run:
+          name: Test variables
+          command: |
+            echo $DOCKER_PASSWORD
+      - run:
           name: Login to Docker Hub
           command: |
             echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
