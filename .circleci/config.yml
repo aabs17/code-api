@@ -71,6 +71,10 @@ jobs:
           command: |
             docker tag << parameters.repository >>:<< parameters.image_tag >> \
             abts17/simplenode:1.0.0
+      - run:
+          name: Login to Docker Hub
+          command: |
+            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
 
       # Subir la imagen a Amazon ECR
       - run:
