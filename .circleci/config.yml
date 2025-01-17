@@ -4,8 +4,6 @@ version: 2.1
 
 jobs:
   build-and-deploy:
-    contexts:
-      - DOCKER_SHARE
     parameters:
       repository:
         type: string
@@ -94,6 +92,8 @@ workflows:
   deploy:
     jobs:
       - build-and-deploy:
+          contexts:
+            - DOCKER_SHARE
           # repository: "glbm-container"
           image_tag: "latest"
           filters:
