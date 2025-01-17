@@ -1,6 +1,8 @@
 version: 2.1
 
-
+orbs:
+  aws-cli: circleci/aws-cli@5.1
+  aws-ecr: circleci/aws-ecr@9.0
 
 jobs:
   build-and-deploy:
@@ -29,22 +31,25 @@ jobs:
           command: docker --version
 
       # Instalar AWS CLI
-      - run:
-          name: Instalar AWS CLI
-          command: |
-            sudo apt-get update
-            sudo apt-get install -y unzip
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install
+      # - run:
+      #     name: Instalar AWS CLI
+      #     command: |
+      #       sudo apt-get update
+      #       sudo apt-get install -y unzip
+      #       curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+      #       unzip awscliv2.zip
+      #       sudo ./aws/install
 
       # Configuración del AWS CLI con claves de entorno ya definidas en CircleCI
-      - run:
-          name: Configurar AWS CLI
-          command: |
-            aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-            aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-            aws configure set default.region << parameters.region >>
+
+      - setup:
+          region: << parameters.region >>
+      # - run:
+      #     name: Configurar AWS CLI
+      #     command: |
+      #       aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+      #       aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+      #       aws configure set default.region << parameters.region >>
       
       # Verificar la identidad del usuario
       - run:
