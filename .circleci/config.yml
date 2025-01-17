@@ -92,7 +92,7 @@ workflows:
   deploy:
     jobs:
       - build-and-deploy:
-          contexts:
+          context:
             - DOCKER_SHARE
           # repository: "glbm-container"
           image_tag: "latest"
