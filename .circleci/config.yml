@@ -81,7 +81,9 @@ jobs:
           name: Subir la imagen Docker a ECR
           command: |
             docker push abts17/simplenode:1.0.0
-
+contexts:
+  - DOCKER_SHARE
+  
 workflows:
   version: 2
   deploy:
