@@ -70,30 +70,19 @@ jobs:
           name: Etiquetar la imagen Docker
           command: |
             docker tag << parameters.repository >>:<< parameters.image_tag >> \
-            abts17/simplenode:1.0.0
-      - run:
-          name: Test variables
-          command: |
-            echo $DOCKER_PASSWORD
-      - run:
-          name: Login to Docker Hub
-          command: |
-            echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+            $AWS_ACCOUNT_ID.dkr.ecr.<< parameters.region >>.amazonaws.com/<< parameters.repository >>:<< parameters.image_tag >>
 
       # Subir la imagen a Amazon ECR
       - run:
           name: Subir la imagen Docker a ECR
           command: |
-            docker push abts17/simplenode:1.0.0
+            docker push $AWS_ACCOUNT_ID.dkr.ecr.<< parameters.region >>.amazonaws.com/<< parameters.repository >>:<< parameters.image_tag >>
 
-  
 workflows:
   version: 2
   deploy:
     jobs:
       - build-and-deploy:
-          context:
-            - DOCKER_SHARE
           # repository: "glbm-container"
           image_tag: "latest"
           filters:
