@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   aws-cli: circleci/aws-cli@5.1
-  aws-ecr: circleci/aws-ecr@9.0
+  aws-ecs: circleci/aws-ecs@6.0.2
 
 jobs:
   build-and-deploy:
@@ -16,6 +16,9 @@ jobs:
       region:
         type: string
         default: "us-east-1" # Región de AWS por defecto
+      cluster:
+        type: string
+        default: "DevGlobalCLuster" # Nombre del cluster ECS por defecto
 
     docker:
       - image: circleci/python:3.9 
@@ -30,33 +33,16 @@ jobs:
           name: Verificar instalación de Docker
           command: docker --version
 
-      # Instalar AWS CLI
-      # - run:
-      #     name: Instalar AWS CLI
-      #     command: |
-      #       sudo apt-get update
-      #       sudo apt-get install -y unzip
-      #       curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-      #       unzip awscliv2.zip
-      #       sudo ./aws/install
-
-      # Configuración del AWS CLI con claves de entorno ya definidas en CircleCI
-
       - aws-cli/setup:
           region: << parameters.region >>
+
+      # # Verificar la identidad del usuario
       # - run:
-      #     name: Configurar AWS CLI
+      #     name: Verificar la identidad del usuario
       #     command: |
-      #       aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-      #       aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-      #       aws configure set default.region << parameters.region >>
-      
-      # Verificar la identidad del usuario
-      - run:
-          name: Verificar la identidad del usuario
-          command: |
-            export AWS_PAGER=""
-            aws sts get-caller-identity
+      #       export AWS_PAGER=""
+      #       aws sts get-caller-identity
+
       # Construcción de la imagen Docker
       - run:
           name: Construir la imagen Docker
@@ -94,4 +80,18 @@ workflows:
             branches:
               only:
                 - main
+      - aws-ecs/deploy_service_update:
+          auth:
+            - aws-cli/setup:
+              region: << parameters.region >>
+          region: << parameters.region >>
+          cluster: << parameters.cluster >>
+          family: "globalBank-bm-container"
+          requires:
+            - build-and-deploy
+          filters:
+            branches:
+              only:
+                - main
+          service_name: glbm-services-test1
         
