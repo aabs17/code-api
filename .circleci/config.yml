@@ -31,6 +31,13 @@ jobs:
       #       aws sts get-caller-identity
       - setup_remote_docker:
           version: 20.10.24
+      # Verificar variables de entorno antes del comando del orb
+      - run:
+          name: Verificar configuración
+          shell: /bin/bash
+          command: |
+            echo "AWS_ACCOUNT_ID=$AWS_ACCOUNT_ID"
+            echo "AWS_REGION=$AWS_REGION"
       - aws-ecr/build_and_push_image:
           auth:
             - aws-cli/setup:
