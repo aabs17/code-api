@@ -22,17 +22,53 @@ jobs:
   
     steps:
       - setup_remote_docker:
-          docker_layer_caching: true
+            docker_layer_caching: true
+      - checkout
+
+      # Verificar instalación de Docker
+      - run:
+          name: Verificar instalación de Docker
+          command: docker --version
+
+      # Instalar AWS CLI
+      # - run:
+      #     name: Instalar AWS CLI
+      #     command: |
+      #       sudo apt-get update
+      #       sudo apt-get install -y unzip
+      #       curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+      #       unzip awscliv2.zip
+      #       sudo ./aws/install
+
+      # Configuración del AWS CLI con claves de entorno ya definidas en CircleCI
 
       - aws-cli/setup:
           region: << parameters.region >>
-
+      # - run:
+      #     name: Configurar AWS CLI
+      #     command: |
+      #       aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+      #       aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+      #       aws configure set default.region << parameters.region >>
+      
       # Verificar la identidad del usuario
       - run:
           name: Verificar la identidad del usuario
           command: |
             export AWS_PAGER=""
             aws sts get-caller-identity
+      # Construcción de la imagen Docker
+      - run:
+          name: Construir la imagen Docker
+          command: |
+            docker build -t << parameters.repository >>:<< parameters.image_tag >> .
+
+      # Autenticación con Amazon ECR
+      - run:
+          name: Autenticarse en Amazon ECR
+          command: |
+            aws ecr get-login-password --region << parameters.region >> | \
+            docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.<< parameters.region >>.amazonaws.com
 
       # Etiquetar la imagen Docker
       - run:
