@@ -19,10 +19,9 @@ jobs:
 
     docker:
       - image: docker:20.10.24-dind
-      # - image: circleci/python:3.9 
-  
-    steps:
+      # - image: circleci/python:3.9
 
+    steps:
       # # Verificar la identidad del usuario
       # - run:
       #     name: Verificar la identidad del usuario
@@ -31,6 +30,19 @@ jobs:
       #       aws sts get-caller-identity
       - setup_remote_docker:
           version: 20.10.24
+      - run:
+          name: Instalar Bash
+          command: |
+            apk update && apk add bash
+      - run:
+          name: Verificar Disponibilidad de Bash
+          command: |
+            if [ -x "$(command -v bash)" ]; then
+              echo "Bash está disponible"
+            else
+              echo "Bash no está instalado"
+              exit 1
+            fi
       # Verificar variables de entorno antes del comando del orb
       - run:
           name: Verificar configuración
@@ -71,4 +83,3 @@ workflows:
             branches:
               only:
                 - main
-        
