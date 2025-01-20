@@ -29,7 +29,7 @@ jobs:
       #       export AWS_PAGER=""
       #       aws sts get-caller-identity
 
-      - aws-ecr/build-and-push-image:
+      - aws-ecr/build_and_push_image:
           auth:
             - aws-cli/setup:
               region: << parameters.region >>
