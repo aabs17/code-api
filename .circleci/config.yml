@@ -21,67 +21,35 @@ jobs:
       - image: circleci/python:3.9 
   
     steps:
-      - setup_remote_docker:
-            docker_layer_caching: true
-      - checkout
 
-      # Verificar instalación de Docker
-      - run:
-          name: Verificar instalación de Docker
-          command: docker --version
-
-      # Instalar AWS CLI
+      # # Verificar la identidad del usuario
       # - run:
-      #     name: Instalar AWS CLI
+      #     name: Verificar la identidad del usuario
       #     command: |
-      #       sudo apt-get update
-      #       sudo apt-get install -y unzip
-      #       curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-      #       unzip awscliv2.zip
-      #       sudo ./aws/install
+      #       export AWS_PAGER=""
+      #       aws sts get-caller-identity
 
-      # Configuración del AWS CLI con claves de entorno ya definidas en CircleCI
-
-      - aws-cli/setup:
+      - aws-ecr/build-and-push-image:
+          auth:
+            - aws-cli/setup:
+              region: << parameters.region >>
           region: << parameters.region >>
+          repo: << parameters.repository >>
+          tag: << parameters.image_tag >>
+
+
+      # # Etiquetar la imagen Docker
       # - run:
-      #     name: Configurar AWS CLI
+      #     name: Etiquetar la imagen Docker
       #     command: |
-      #       aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-      #       aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-      #       aws configure set default.region << parameters.region >>
-      
-      # Verificar la identidad del usuario
-      - run:
-          name: Verificar la identidad del usuario
-          command: |
-            export AWS_PAGER=""
-            aws sts get-caller-identity
-      # Construcción de la imagen Docker
-      - run:
-          name: Construir la imagen Docker
-          command: |
-            docker build -t << parameters.repository >>:<< parameters.image_tag >> .
+      #       docker tag << parameters.repository >>:<< parameters.image_tag >> \
+      #       $AWS_ACCOUNT_ID.dkr.ecr.<< parameters.region >>.amazonaws.com/<< parameters.repository >>:<< parameters.image_tag >>
 
-      # Autenticación con Amazon ECR
-      - run:
-          name: Autenticarse en Amazon ECR
-          command: |
-            aws ecr get-login-password --region << parameters.region >> | \
-            docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.<< parameters.region >>.amazonaws.com
-
-      # Etiquetar la imagen Docker
-      - run:
-          name: Etiquetar la imagen Docker
-          command: |
-            docker tag << parameters.repository >>:<< parameters.image_tag >> \
-            $AWS_ACCOUNT_ID.dkr.ecr.<< parameters.region >>.amazonaws.com/<< parameters.repository >>:<< parameters.image_tag >>
-
-      # Subir la imagen a Amazon ECR
-      - run:
-          name: Subir la imagen Docker a ECR
-          command: |
-            docker push $AWS_ACCOUNT_ID.dkr.ecr.<< parameters.region >>.amazonaws.com/<< parameters.repository >>:<< parameters.image_tag >>
+      # # Subir la imagen a Amazon ECR
+      # - run:
+      #     name: Subir la imagen Docker a ECR
+      #     command: |
+      #       docker push $AWS_ACCOUNT_ID.dkr.ecr.<< parameters.region >>.amazonaws.com/<< parameters.repository >>:<< parameters.image_tag >>
 
 workflows:
   version: 2
