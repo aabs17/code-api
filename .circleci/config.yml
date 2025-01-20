@@ -91,9 +91,9 @@ workflows:
       - aws-ecs/deploy_service_update:
           auth:
             - aws-cli/setup:
-              region: << parameters.region >>
-          region: << parameters.region >>
-          cluster: << parameters.cluster >>
+              region: << pipeline.parameters.region >>
+          region: << pipeline.parameters.region >>
+          cluster: << pipeline.parameters.cluster >>
           family: "globalBank-bm-container"
           requires:
             - build-and-deploy
