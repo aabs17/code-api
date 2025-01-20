@@ -12,7 +12,7 @@ jobs:
         default: "glbm-container" # Nombre del repositorio ECR por defecto
       image_tag:
         type: string
-        default: "latest" # Tag de la imagen por defecto
+        default: "1.0.1" # Tag de la imagen por defecto
       region:
         type: string
         default: "us-east-1" # Región de AWS por defecto
