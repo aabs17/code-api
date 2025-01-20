@@ -18,7 +18,8 @@ jobs:
         default: "us-east-1" # Región de AWS por defecto
 
     docker:
-      - image: circleci/python:3.9 
+      - image: docker:20.10.24-dind
+      # - image: circleci/python:3.9 
   
     steps:
 
