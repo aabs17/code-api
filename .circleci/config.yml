@@ -101,5 +101,5 @@ workflows:
             branches:
               only:
                 - main
-          service_name: glbm-services-test1
+          service_name: glbm-services-test2
         
