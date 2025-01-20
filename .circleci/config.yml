@@ -94,7 +94,7 @@ workflows:
               region: << pipeline.parameters.region >>
           region: << pipeline.parameters.region >>
           cluster: << pipeline.parameters.cluster >>
-          family: "globalBank-bm-container:3"
+          family: "globalBank-bm-container"
           requires:
             - build-and-deploy
           filters:
