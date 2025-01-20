@@ -12,7 +12,7 @@ jobs:
         default: "glbm-container" # Nombre del repositorio ECR por defecto
       image_tag:
         type: string
-        default: "1.0.1" # Tag de la imagen por defecto
+        default: "latest" # Tag de la imagen por defecto
       region:
         type: string
         default: "us-east-1" # Región de AWS por defecto
@@ -89,7 +89,7 @@ workflows:
     jobs:
       - build-and-deploy:
           # repository: "glbm-container"
-          image_tag: "latest"
+          image_tag: "1.0.1"
           filters:
             branches:
               only:
