@@ -24,9 +24,6 @@ jobs:
       region:
         type: string
         default: "us-east-1" # Región de AWS por defecto
-      cluster:
-        type: string
-        default: "DevGlobalCLuster" # Nombre del cluster ECS por defecto
 
     docker:
       - image: circleci/python:3.9 
@@ -82,8 +79,7 @@ workflows:
   deploy:
     jobs:
       - build-and-deploy:
-          # repository: "glbm-container"
-          image_tag: "1.0.1"
+          image_tag: "latest"
           filters:
             branches:
               only:
@@ -101,5 +97,5 @@ workflows:
             branches:
               only:
                 - main
-          service_name: glbm-services-test2
+          service_name: glbm-services-test1
         
