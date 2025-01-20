@@ -29,7 +29,8 @@ jobs:
       #     command: |
       #       export AWS_PAGER=""
       #       aws sts get-caller-identity
-
+      - setup_remote_docker:
+          version: 20.10.24
       - aws-ecr/build_and_push_image:
           auth:
             - aws-cli/setup:
