@@ -4,6 +4,14 @@ orbs:
   aws-cli: circleci/aws-cli@5.1
   aws-ecs: circleci/aws-ecs@6.0.2
 
+parameters:
+  region:
+    type: string
+    default: "us-east-1" # Región de AWS por defecto
+  cluster:
+    type: string
+    default: "DevGlobalCLuster" # Nombre del cluster ECS por defecto
+
 jobs:
   build-and-deploy:
     parameters:
